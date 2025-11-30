@@ -1,10 +1,16 @@
 package main
 
 import (
-	"fmt"
 	"go-posts/internal/config"
+	"go-posts/internal/http-server/handlers/posts/getall"
+	"go-posts/internal/http-server/handlers/posts/save"
+	storage "go-posts/internal/storage/sqlite"
 	"log/slog"
+	"net/http"
 	"os"
+
+	"github.com/go-chi/chi/middleware"
+	"github.com/go-chi/chi/v5"
 )
 
 const (
@@ -16,8 +22,32 @@ const (
 func main() {
 	cfg := config.MustLoad()
 	log := setupLogger(cfg.Env)
-	
-	fmt.Println(cfg)
+	storage, err := storage.New(cfg.StoragePath)
+	if err != nil {
+		log.Error(err.Error())
+		os.Exit(1)
+	}
+
+	router := chi.NewRouter()
+	router.Use(middleware.Recoverer)
+	router.Use(middleware.URLFormat)
+
+	router.Get("/posts", getall.New(log, storage))
+	router.Post("/posts", save.New(log, storage))
+
+	log.Info("starting server", slog.String("address", cfg.Address))
+
+	srv := &http.Server{
+		Addr: cfg.Address,
+		Handler: router,
+		ReadTimeout: cfg.HTTPServer.Timeout,
+		WriteTimeout: cfg.HTTPServer.Timeout,
+		IdleTimeout: cfg.HTTPServer.Timeout,
+	}
+
+	if err := srv.ListenAndServe(); err != nil {
+		log.Error("failed to start server")
+	}
 }
 
 func setupLogger(env string) *slog.Logger {
