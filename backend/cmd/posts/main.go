@@ -4,13 +4,14 @@ import (
 	"go-posts/internal/config"
 	"go-posts/internal/http-server/handlers/posts/getall"
 	"go-posts/internal/http-server/handlers/posts/save"
+	"go-posts/internal/http-server/handlers/spahandler"
 	storage "go-posts/internal/storage/sqlite"
 	"log/slog"
 	"net/http"
 	"os"
 
-	"github.com/go-chi/chi/middleware"
 	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/chi/v5/middleware"
 )
 
 const (
@@ -32,17 +33,18 @@ func main() {
 	router.Use(middleware.Recoverer)
 	router.Use(middleware.URLFormat)
 
-	router.Get("/posts", getall.New(log, storage))
-	router.Post("/posts", save.New(log, storage))
+	router.Get("/*", spahandler.New(log, "../frontend", "index.html"))
+	router.Get("/api/posts", getall.New(log, storage))
+	router.Post("/api/posts", save.New(log, storage))
 
 	log.Info("starting server", slog.String("address", cfg.Address))
 
 	srv := &http.Server{
-		Addr: cfg.Address,
-		Handler: router,
-		ReadTimeout: cfg.HTTPServer.Timeout,
+		Addr:         cfg.Address,
+		Handler:      router,
+		ReadTimeout:  cfg.HTTPServer.Timeout,
 		WriteTimeout: cfg.HTTPServer.Timeout,
-		IdleTimeout: cfg.HTTPServer.Timeout,
+		IdleTimeout:  cfg.HTTPServer.Timeout,
 	}
 
 	if err := srv.ListenAndServe(); err != nil {
