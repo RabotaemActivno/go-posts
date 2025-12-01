@@ -20,31 +20,27 @@ func New(log *slog.Logger, postsGetter PostsGetter) http.HandlerFunc {
 		posts, err := postsGetter.GetAllPosts()
 		if err != nil {
 
-			failedResp := struct {
-				status string
-				text string
-			} {
-				status: "Error",
-				text: "Failed to get posts",
-			}
-
 			log.Error("failed to get posts")
-			
-			render.JSON(w, r, failedResp)
+
+			render.JSON(w, r, struct {
+				Status string `json:"status"`
+				Text   string `json:"text"`
+			}{
+				Status: "Error",
+				Text:   "Failed to get posts",
+			})
 
 			return
 		}
 
 		log.Info("posts get")
 
-		successResp := struct {
-			status string
-			posts []storage.Post
-		} {
-			status: "OK",
-			posts: posts,
-		}
-
-		render.JSON(w, r, successResp)
+		render.JSON(w, r, struct {
+			Status string         `json:"status"`
+			Posts  []storage.Post `json:"posts"`
+		}{
+			Status: "OK",
+			Posts:  posts,
+		})
 	}
 }

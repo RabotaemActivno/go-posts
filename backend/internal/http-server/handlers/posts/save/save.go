@@ -8,13 +8,13 @@ import (
 )
 
 type Request struct {
-	Author string `json:"Author"`
-	Text string `json:"text"`
+	Author string `json:"author"`
+	Text   string `json:"text"`
 }
 
-type FailedResponse struct{
-	status string
-	text string
+type FailedResponse struct {
+	Status string `json:"status"`
+	Text   string `json:"text"`
 }
 
 type PostSaver interface {
@@ -36,10 +36,10 @@ func New(log *slog.Logger, postSaver PostSaver) http.HandlerFunc {
 
 			failedResp := struct {
 				status string
-				text string
-			} {
+				text   string
+			}{
 				status: "Error",
-				text: "Bad request",
+				text:   "Bad request",
 			}
 
 			render.JSON(w, r, failedResp)
@@ -54,21 +54,21 @@ func New(log *slog.Logger, postSaver PostSaver) http.HandlerFunc {
 			log.Error("failed to save post")
 
 			render.JSON(w, r, FailedResponse{
-				status: "Error",
-				text: "Failed to save url",
+				Status: "Error",
+				Text:   "Failed to save url",
 			})
 
-			return 
+			return
 		}
 
 		log.Info("post saved")
 
 		successResp := struct {
-			status string
-			postID int64
-		} {
-			status: "OK",
-			postID: id,
+			Status string `json:"status"`
+			PostID int64  `json:"postID"`
+		}{
+			Status: "OK",
+			PostID: id,
 		}
 
 		render.JSON(w, r, successResp)

@@ -35,7 +35,7 @@ func New(storagePath string) (*Storage, error) {
 		return nil, fmt.Errorf("%s: %w", op, err)
 	}
 
-	return &Storage{db:db}, nil
+	return &Storage{db: db}, nil
 }
 
 func (s *Storage) SavePost(author string, text string) (int64, error) {
@@ -64,22 +64,24 @@ func (s *Storage) GetAllPosts() ([]storage.Post, error) {
 
 	var posts []storage.Post
 
-	stmt, err := s.db.Prepare("SELECT * FROM posts")
+	stmt, err := s.db.Prepare("SELECT id, author, text FROM posts")
 	if err != nil {
 		return nil, fmt.Errorf("%s: %w", op, err)
 	}
 
 	defer stmt.Close()
 
-	rows, err := stmt.Query(100)
+	rows, err := stmt.Query()
 	if err != nil {
 		return nil, fmt.Errorf("%s: %w", op, err)
 	}
 
+	defer rows.Close()
+
 	for rows.Next() {
 		var p storage.Post
 		err := rows.Scan(&p.ID, &p.Author, &p.Text)
-		if err != nil {	
+		if err != nil {
 			return nil, fmt.Errorf("%s: %w", op, err)
 		}
 
@@ -87,4 +89,4 @@ func (s *Storage) GetAllPosts() ([]storage.Post, error) {
 	}
 
 	return posts, nil
-} 
+}
