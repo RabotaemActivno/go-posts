@@ -33,7 +33,7 @@ func main() {
 	router.Use(middleware.Recoverer)
 	router.Use(middleware.URLFormat)
 
-	router.Get("/*", spahandler.New(log, "../frontend", "index.html"))
+	router.Get("/*", spahandler.New(log, "../frontend/dist", "index.html"))
 	router.Get("/api/posts", getall.New(log, storage))
 	router.Post("/api/posts", save.New(log, storage))
 
