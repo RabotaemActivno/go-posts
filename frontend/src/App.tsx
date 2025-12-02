@@ -36,7 +36,7 @@ function App() {
     setIsCreating(true);
     setCreateError(null);
 
-    const response = await preparedFetch<CreatePostResponse>(ResponseMethods.Post, payload);
+    const response = await preparedFetch<CreatePostResponse>(ResponseMethods.Post, "/api/posts", payload);
 
     if (response?.status === StatusCode.OK && typeof response.postID === "number") {
       setPosts((prev) => [{ id: response.postID, ...payload }, ...prev]);
@@ -48,13 +48,24 @@ function App() {
     setIsCreating(false);
   };
 
+  const handlerRemovePost = async (id: number) => {
+    const response = await preparedFetch<any>(ResponseMethods.Delete, `/api/posts/${id}`)
+    if (response?.status === StatusCode.OK) {
+      const newPosts = posts.filter(post => post.id !== id);
+      setPosts([...newPosts])
+    }
+  }
+
   return (
     <div>
       <Navbar onCreateClick={() => {
         setCreateError(null);
         setCreateModalOpen(true);
       }} />
-      <List posts={posts}/>
+      <List 
+        posts={posts}
+        handlerRemovePost = {handlerRemovePost}
+      />
       <CreatePostModal
           open={isCreateModalOpen}
           onClose={() => {

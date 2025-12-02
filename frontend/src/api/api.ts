@@ -1,6 +1,7 @@
 export enum ResponseMethods {
     Get = "GET",
     Post = "POST",
+    Delete = "DELETE"
 }
 
 export enum StatusCode {
@@ -13,8 +14,7 @@ export type AddPostBody = {
     text: string
 }
 
-export async function preparedFetch<T>(method: ResponseMethods, body?: AddPostBody): Promise<T | null> {
-    const apiRoute = "/api/posts";
+export async function preparedFetch<T>(method: ResponseMethods, apiRoute = "/api/posts", body?: AddPostBody): Promise<T | null> {
     const stringifyBody = body ? JSON.stringify(body) : null;
     const options: RequestInit = {
         method,
