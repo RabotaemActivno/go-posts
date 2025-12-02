@@ -10,3 +10,15 @@ export type ResponseData = {
   status: StatusCode,
   posts: Post[]
 }
+
+export type CreatePostResponse =
+  | {
+      status: StatusCode.OK,
+      postID: number,
+      text?: string
+    }
+  | {
+      status: StatusCode.Error,
+      text: string,
+      postID?: number
+    };

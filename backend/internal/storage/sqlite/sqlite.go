@@ -90,3 +90,26 @@ func (s *Storage) GetAllPosts() ([]storage.Post, error) {
 
 	return posts, nil
 }
+
+func (s *Storage) RemovePost(id int64) (int64, error) {
+	const op = "storage.sqlite.RemovePost"
+	
+	stmt, err := s.db.Prepare("DELETE FROM posts WHERE id = (?)")
+	if err != nil {
+		return 0, fmt.Errorf("%s: prepare statement %w", op, err)
+	}
+
+	res, err := stmt.Exec(id)
+	if err != nil {
+		return 0, fmt.Errorf("%s: exec: %w", op, err)
+	}
+
+	affected, err := res.RowsAffected()
+	if err != nil {
+		return 0, fmt.Errorf("%s: rows affected: %w", op, err)
+	}
+	if affected == 0 {
+		return 0, storage.ErrPostNotFound
+	}
+	return id, nil
+}

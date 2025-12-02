@@ -7,7 +7,7 @@ var (
 )
 
 type Post struct {
-	ID int64
-	Author string
-	Text string
+	ID     int64  `json:"id"`
+	Author string `json:"author"`
+	Text   string `json:"text"`
 }

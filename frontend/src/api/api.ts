@@ -13,15 +13,26 @@ export type AddPostBody = {
     text: string
 }
 
-export async function preparedFetch<T>(method: ResponseMethods, body?: AddPostBody): Promise<T> {
+export async function preparedFetch<T>(method: ResponseMethods, body?: AddPostBody): Promise<T | null> {
     const apiRoute = "/api/posts";
     const stringifyBody = body ? JSON.stringify(body) : null;
-    let data
+    const options: RequestInit = {
+        method,
+    };
+
+    if (stringifyBody) {
+        options.body = stringifyBody;
+        options.headers = {
+            "Content-Type": "application/json",
+        };
+    }
+
+    let data;
     try {
-        const res = await fetch(apiRoute, {
-            method,
-            body: stringifyBody
-        });
+        const res = await fetch(apiRoute, options);
+        if (!res.ok) {
+            throw new Error(`Request failed with status ${res.status}`);
+        }
         data = await res.json();
     } catch(err) {
         console.log(err);
