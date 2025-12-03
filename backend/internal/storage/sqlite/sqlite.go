@@ -113,3 +113,31 @@ func (s *Storage) RemovePost(id int64) (int64, error) {
 	}
 	return id, nil
 }
+
+func (s *Storage) UpdatePost(id int64, author string, text string) (storage.Post, error) {
+	const op = "storage.sqlite.UpdatePost"
+
+	stmt, err := s.db.Prepare("UPDATE posts SET author = (?), text = (?) WHERE id = (?)")
+	if err != nil {
+		return storage.Post{}, fmt.Errorf("%s: prepare statement %w", op, err)
+	}
+
+	res, err := stmt.Exec(author, text, id)
+	if err != nil {
+		return storage.Post{}, fmt.Errorf("%s: exec: %w", op, err)
+	}
+
+	affected, err := res.RowsAffected()
+	if err != nil {
+		return storage.Post{}, fmt.Errorf("%s: rows affected: %w", op, err)
+	}
+	if affected == 0 {
+		return storage.Post{}, storage.ErrPostNotFound
+	}
+
+	return storage.Post{
+		ID: id,
+		Author: author,
+		Text: text,
+	}, nil
+}

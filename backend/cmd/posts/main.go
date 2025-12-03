@@ -5,6 +5,7 @@ import (
 	"go-posts/internal/http-server/handlers/posts/getall"
 	"go-posts/internal/http-server/handlers/posts/remove"
 	"go-posts/internal/http-server/handlers/posts/save"
+	"go-posts/internal/http-server/handlers/posts/update"
 	"go-posts/internal/http-server/handlers/spahandler"
 	storage "go-posts/internal/storage/sqlite"
 	"log/slog"
@@ -38,6 +39,7 @@ func main() {
 	router.Get("/api/posts", getall.New(log, storage))
 	router.Post("/api/posts", save.New(log, storage))
 	router.Delete("/api/posts/{id}", remove.New(log, storage))
+	router.Patch("/api/posts/{id}", update.New(log, storage))
 
 	log.Info("starting server", slog.String("address", cfg.Address))
 

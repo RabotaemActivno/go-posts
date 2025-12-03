@@ -1,7 +1,8 @@
 export enum ResponseMethods {
     Get = "GET",
     Post = "POST",
-    Delete = "DELETE"
+    Delete = "DELETE",
+    Patch = "PATCH",
 }
 
 export enum StatusCode {

@@ -30,6 +30,7 @@ func New(log *slog.Logger, postRemover PostRemover) http.HandlerFunc {
 				Status: "Error",
 				Text: "Invalid id",
 			})
+			return 
 		}
 
 		id, err := strconv.ParseInt(strID, 10, 64)
@@ -39,6 +40,7 @@ func New(log *slog.Logger, postRemover PostRemover) http.HandlerFunc {
 				Status: "Error",
 				Text: "Bad response",
 			})
+			return 
 		}
 
 		id, err = postRemover.RemovePost(id) 
@@ -48,6 +50,7 @@ func New(log *slog.Logger, postRemover PostRemover) http.HandlerFunc {
 				Status: "Error",
 				Text: "Bad response",
 			})
+			return 
 		}
 
 		log.Info("post removed")

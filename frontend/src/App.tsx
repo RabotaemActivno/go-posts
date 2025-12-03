@@ -22,6 +22,24 @@ function App() {
     loadPosts();
   }, [])
 
+  const handlerUpdatePost = async (id: number) => {
+    const payload = {
+      author: values.author.trim(),
+      text: values.text.trim(),
+    };
+
+    if (!payload.author || !payload.text) {
+      setCreateError("Заполните автора и текст поста");
+      return;
+    }
+
+    setIsCreating(true);
+    setCreateError(null);
+
+
+    const response = await preparedFetch<CreatePostResponse>(ResponseMethods.Patch, `/api/posts/${id}`, payload);
+  } 
+
   const handleCreatePost = async (values: AddPostBody) => {
     const payload = {
       author: values.author.trim(),
@@ -39,7 +57,7 @@ function App() {
     const response = await preparedFetch<CreatePostResponse>(ResponseMethods.Post, "/api/posts", payload);
 
     if (response?.status === StatusCode.OK && typeof response.postID === "number") {
-      setPosts((prev) => [{ id: response.postID, ...payload }, ...prev]);
+      setPosts((prev) => [...prev, { id: response.postID, ...payload }]);
       setCreateModalOpen(false);
     } else {
       setCreateError(response?.text ?? "Не удалось создать пост");
@@ -65,6 +83,7 @@ function App() {
       <List 
         posts={posts}
         handlerRemovePost = {handlerRemovePost}
+        handlerUpdatePost = {handlerUpdatePost}
       />
       <CreatePostModal
           open={isCreateModalOpen}
