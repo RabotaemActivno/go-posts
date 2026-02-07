@@ -1,0 +1,14 @@
+services:
+  go-backend: 
+    build: ./backend
+    container_name: go-backend
+  go-frontend:
+    build: ./frontend
+    container_name: go-frontend
+  go-nginx:
+    image: nginx:stable-alpine3.23
+    ports:
+      - "8080:80"
+    volumes: 
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./frontend/dist:/usr/share/nginx/html:ro
